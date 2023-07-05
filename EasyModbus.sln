@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleAppStd", "ConsoleApp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyModbus_V5.0", "EasyModbus_NET5\EasyModbus_V5.0.csproj", "{83AFFC60-BC95-46B1-861F-B1F80270FBFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyModbus_Net60", "EasyModbus_Net60\EasyModbus_Net60.csproj", "{6BD5A885-D0A3-44C0-BF73-E2118519EAFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyModbus_Net60", "EasyModbus_Net60\EasyModbus_Net60.csproj", "{6BD5A885-D0A3-44C0-BF73-E2118519EAFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

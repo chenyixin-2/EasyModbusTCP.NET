@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>EasyModbus</AssemblyName>
     <RootNamespace>EasyModbus</RootNamespace>
+    <AssemblyVersion>1.0.1.0120</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
