@@ -30,6 +30,7 @@ using System.Net;
 using System.Threading;
 using System.Net.NetworkInformation;
 using System.IO.Ports;
+using System.Globalization;
 
 namespace EasyModbus
 {
@@ -288,8 +289,9 @@ namespace EasyModbus
 				{
 					networkStream.BeginRead(client.Buffer, 0, client.Buffer.Length, ReadCallbackRemoteMode, client);
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					throw ex;
 				}
 			}
 		}
@@ -308,6 +310,7 @@ namespace EasyModbus
 				catch (Exception) { }
 				server.Stop();
 			}
+			client?.TcpClient.Dispose();
 		}
 
 
@@ -366,6 +369,7 @@ namespace EasyModbus
 		private bool udpFlag;
 		private bool tcpFlag;
 		private bool serialFlag;
+		private bool serverMode = true;
 		private int baudrate = 9600;
 		private System.IO.Ports.Parity parity = Parity.Even;
 		private System.IO.Ports.StopBits stopBits = StopBits.One;
@@ -378,7 +382,7 @@ namespace EasyModbus
 		private IPEndPoint iPEndPoint;
 		private TCPHandler tcpHandler;
 		Thread listenerThread;
-		Thread clientConnectionThread;
+		Thread clientConnectionThread = null;
 		private ModbusProtocol[] modbusLogData = new ModbusProtocol[100];
 		public bool FunctionCode1Disabled { get; set; }
 		public bool FunctionCode2Disabled { get; set; }
@@ -449,21 +453,19 @@ namespace EasyModbus
 			{
 				tcpHandler.Disconnect();
 				listenerThread.Abort();
-
 			}
 			catch (Exception) { }
 			listenerThread.Join();
 			try
 			{
-
-				clientConnectionThread.Abort();
+				clientConnectionThread?.Abort();
 			}
 			catch (Exception) { }
 		}
 
 		private void ListenerThread()
 		{
-			if (!udpFlag & !serialFlag)
+			if (!udpFlag & ServerMode)
 			{
 				if (udpClient != null)
 				{
@@ -501,7 +503,8 @@ namespace EasyModbus
 						tcpHandler = new TCPHandler(RemoteIPAddress, port);
 						if (debug) StoreLogData.Instance.Store($"EasyModbus Server listing for incomming data at Port {port}, local IP {RemoteIPAddress}", System.DateTime.Now);
 						tcpHandler.dataChanged += new TCPHandler.DataChanged(ProcessReceivedData);
-					}catch(Exception ex)
+					}
+					catch (Exception ex)
 					{
 						throw ex;
 					}
@@ -617,7 +620,7 @@ namespace EasyModbus
 				{
 					UInt16[] wordData = new UInt16[1];
 					byte[] byteData = new byte[2];
-					receiveDataThread.timeStamp = DateTime.Now;
+					receiveDataThread.timeStamp = DateTime.UtcNow;
 					receiveDataThread.request = true;
 					if (!serialFlag)
 					{
@@ -881,7 +884,7 @@ namespace EasyModbus
 					sendException(sendData.errorCode, sendData.exceptionCode, receiveData, sendData, stream, portIn, ipAddressIn);
 					break;
 			}
-			sendData.timeStamp = DateTime.Now;
+			sendData.timeStamp = DateTime.UtcNow;
 		}
 		#endregion
 
@@ -2268,6 +2271,18 @@ namespace EasyModbus
 			set
 			{
 				serialFlag = value;
+			}
+		}
+
+		public bool ServerMode
+		{
+			get
+			{
+				return serverMode;
+			}
+			set
+			{
+				serverMode = value;
 			}
 		}
 
